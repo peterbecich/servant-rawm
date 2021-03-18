@@ -63,3 +63,21 @@ instance RunClient m => HasClient m (RawM' serverType) where
     -> Client mon (RawM' serverType)
     -> Client mon' (RawM' serverType)
   hoistClientMonad Proxy Proxy f cl = f . cl
+
+instance RunClient m => HasClient m (RawM' FileServer) where
+  type Client m (RawM' FileServer) = (Request -> Request) -> m Response
+
+  clientWithRoute
+    :: Proxy m
+    -> Proxy (RawM' FileServer)
+    -> Request
+    -> Client m (RawM' FileServer)
+  clientWithRoute Proxy Proxy req reqFunc = runRequest $ reqFunc req
+
+  hoistClientMonad
+    :: Proxy m
+    -> Proxy (RawM' FileServer)
+    -> (forall x. mon x -> mon' x)
+    -> Client mon (RawM' FileServer)
+    -> Client mon' (RawM' FileServer)
+  hoistClientMonad Proxy Proxy f cl = f . cl
