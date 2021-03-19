@@ -21,6 +21,7 @@ library
   exposed-modules:     Servant.RawM.Client
   build-depends:       base >= 4.8 && < 5
                      , servant-rawm >= 1.0
+                     , servant-client >= 0.16
                      , servant-client-core >= 0.16
   default-language:    Haskell2010
   ghc-options:         -Wall -fwarn-incomplete-uni-patterns -fwarn-incomplete-record-updates -fwarn-monomorphism-restriction

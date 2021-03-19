@@ -26,6 +26,7 @@ module Servant.RawM.Client (
 ) where
 
 import Data.Proxy          (Proxy (Proxy))
+import Servant.Client      (ClientM)
 import Servant.Client.Core (Client,
                             HasClient (clientWithRoute, hoistClientMonad),
                             Request, Response, RunClient)
@@ -58,6 +59,24 @@ instance RunClient m => HasClient m (RawM' serverType) where
 
   hoistClientMonad
     :: Proxy m
+    -> Proxy (RawM' serverType)
+    -> (forall x. mon x -> mon' x)
+    -> Client mon (RawM' serverType)
+    -> Client mon' (RawM' serverType)
+  hoistClientMonad Proxy Proxy f cl = f . cl
+
+instance HasClient ClientM (RawM' serverType) where
+  type Client ClientM (RawM' serverType) = (Request -> Request) -> ClientM Response
+
+  clientWithRoute
+    :: Proxy ClientM
+    -> Proxy (RawM' serverType)
+    -> Request
+    -> Client ClientM (RawM' serverType)
+  clientWithRoute Proxy Proxy req reqFunc = runRequest $ reqFunc req
+
+  hoistClientMonad
+    :: Proxy ClientM
     -> Proxy (RawM' serverType)
     -> (forall x. mon x -> mon' x)
     -> Client mon (RawM' serverType)
